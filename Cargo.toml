@@ -1,0 +1,11 @@
+[package]
+name = "hidapi-rs"
+version = "0.1.0"
+authors = ["roblabla <unfiltered@roblab.la>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+winapi = { version = "0.3", features = ["debug", "handleapi", "synchapi", "winbase", "errhandlingapi", "minwindef", "setupapi", "hidsdi", "ioapiset", "hidclass", "winerror"] }
+scopeguard = "1.1.0"
