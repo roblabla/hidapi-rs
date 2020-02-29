@@ -522,7 +522,7 @@ pub fn hid_read_timeout(dev: &mut HidDevice, data: &mut [u8], milliseconds: u32)
         }
     }
 
-    if milliseconds >= 0 {
+    if milliseconds != INFINITE {
         /* See if there is any data yet. */
         let res = unsafe { WaitForSingleObject(ev, milliseconds) };
         if res != WAIT_OBJECT_0 {
