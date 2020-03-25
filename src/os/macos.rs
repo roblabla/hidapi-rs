@@ -17,6 +17,7 @@ use core_foundation_sys::string::*;
 use core_foundation_sys::number::*;
 use core_foundation_sys::set::*;
 use core_foundation_sys::runloop::*;
+use mach::mach_error::*;
 use std::ffi::{CStr, CString};
 use widestring::U16String;
 use scopeguard::ScopeGuard;
@@ -94,11 +95,15 @@ impl HidDevice {
                                    report_id as isize,
                                    data_to_send.as_ptr(), data_to_send.len() as isize) };
 
-        if res == 0 /*kIOReturnSuccess*/ {
-            return Ok(data.len());
+        if res != 0 /*kIOReturnSuccess*/ {
+            unsafe {
+                let s = mach_error_string(res);
+                let s = CStr::from_ptr(s);
+                return Err(HidError::HidApiError { message: "IOHIDDeviceSetReport: ".to_string() + &s.to_string_lossy() });
+            }
         }
 
-        return Err(HidError::HidApiError { message: "IOHIDDeviceSetReport: failed to set report".to_string() });
+        Ok(data.len())
     }
 
     pub fn write(&self, data: &[u8]) -> HidResult<usize> {
@@ -790,48 +795,51 @@ pub fn hid_open_path(device_path: &CStr) -> HidResult<HidDevice> {
 
     /* Open the IOHIDDevice */
     let ret = unsafe { IOHIDDeviceOpen(*device_handle_guard, kIOHIDOptionsTypeSeizeDevice) };
-    if ret == 0 /* kIOReturnSuccess */ {
-        /* Create the buffers for receiving data */
-        //let max_input_report_len = get_max_report_length(*device_handle_guard);
-        //let input_report_buf = vec![0; max_input_report_len];
-
-        /* Create the Run Loop Mode for this device.
-           printing the reference seems to work. */
-        //let s = format!("HIDAPI_%p\0", *device_handle);
-        //let run_loop_mode = CFStringCreateWithBytes(std::ptr::null_mut(), s.as_bytes(), s.len(), kCFStringEncodingUTF8, false);
-
-        /* Attach the device to a Run Loop */
-        //IOHIDDeviceRegisterInputReportCallback(
-        //    device_handle_guard, input_report_buf, max_input_report_len,
-        //    &hid_report_callback, dev);
-        //IOHIDDeviceRegisterRemovalCallback(dev->device_handle, hid_device_removal_callback, dev);
-
-        /* Start the read thread */
-        //pthread_create(&dev->thread, NULL, read_thread, dev);
-
-        /* Wait here for the read thread to be initialized. */
-        //pthread_barrier_wait(&dev->barrier);
-
-        return Ok(HidDevice {
-            device_handle: ScopeGuard::into_inner(device_handle_guard),
-            blocking: true,
-            uses_numbered_reports: false,
-            disconnected: false,
-            //run_loop_mode: CFStringRef,
-            //run_loop: CFRunLoopRef,
-            //source: CFRunLoopSourceRef,
-            max_input_report_len: 0,
-            input_report: Mutex::new(Vec::new()),
-
-            //thread: Thread,
-            //condition: Condvar,
-            //barrier: Barrier,
-            //shutdown_barrier; /* Ensures correct shutdown sequence */
-            //int shutdown_thread;
-        })
-    } else {
-        return Err(HidError::HidApiError { message: "IOHIDDeviceOpen: failed to open HID device.".into() })
+    if ret != 0 /* kIOReturnSuccess */ {
+        unsafe {
+            let s = mach_error_string(ret);
+            let s = CStr::from_ptr(s);
+            return Err(HidError::HidApiError { message: "IOHIDDeviceOpen: ".to_string() + &s.to_string_lossy() });
+        }
     }
+    /* Create the buffers for receiving data */
+    //let max_input_report_len = get_max_report_length(*device_handle_guard);
+    //let input_report_buf = vec![0; max_input_report_len];
+
+    /* Create the Run Loop Mode for this device.
+       printing the reference seems to work. */
+    //let s = format!("HIDAPI_%p\0", *device_handle);
+    //let run_loop_mode = CFStringCreateWithBytes(std::ptr::null_mut(), s.as_bytes(), s.len(), kCFStringEncodingUTF8, false);
+
+    /* Attach the device to a Run Loop */
+    //IOHIDDeviceRegisterInputReportCallback(
+    //    device_handle_guard, input_report_buf, max_input_report_len,
+    //    &hid_report_callback, dev);
+    //IOHIDDeviceRegisterRemovalCallback(dev->device_handle, hid_device_removal_callback, dev);
+
+    /* Start the read thread */
+    //pthread_create(&dev->thread, NULL, read_thread, dev);
+
+    /* Wait here for the read thread to be initialized. */
+    //pthread_barrier_wait(&dev->barrier);
+
+    return Ok(HidDevice {
+        device_handle: ScopeGuard::into_inner(device_handle_guard),
+        blocking: true,
+        uses_numbered_reports: false,
+        disconnected: false,
+        //run_loop_mode: CFStringRef,
+        //run_loop: CFRunLoopRef,
+        //source: CFRunLoopSourceRef,
+        max_input_report_len: 0,
+        input_report: Mutex::new(Vec::new()),
+
+        //thread: Thread,
+        //condition: Condvar,
+        //barrier: Barrier,
+        //shutdown_barrier; /* Ensures correct shutdown sequence */
+        //int shutdown_thread;
+    })
 }
 /*
 

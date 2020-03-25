@@ -21,6 +21,7 @@ dependencies = [
  "core-foundation",
  "core-foundation-sys",
  "io-kit-sys",
+ "mach",
  "scopeguard",
  "widestring",
  "winapi",
@@ -44,8 +45,7 @@ checksum = "dea0c0405123bba743ee3f91f49b1c7cfb684eef0da0a50110f758ccf24cdff0"
 [[package]]
 name = "mach"
 version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b823e83b2affd8f40a9ee8c29dbc56404c1e34cd2710921f2801e2cf29527afa"
+source = "git+https://github.com/roblabla/mach?branch=for-hidapi#e504886761be3ace4541ca319cc579af4b39250f"
 dependencies = [
  "libc",
 ]

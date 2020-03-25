@@ -17,8 +17,10 @@ winapi = { version = "0.3", features = ["debug", "handleapi", "synchapi", "winba
 io-kit-sys = "0.1"
 core-foundation-sys = "0.7.0"
 core-foundation = "0.7.0"
+mach = "0.3"
 
 [patch.crates-io]
 core-foundation-sys = { git = "https://github.com/roblabla/core-foundation-rs", branch = "for-hidapi" }
 core-foundation = { git = "https://github.com/roblabla/core-foundation-rs", branch = "for-hidapi" }
 io-kit-sys = { git = "https://github.com/roblabla/io-kit-rs" }
+mach = { git = "https://github.com/roblabla/mach", branch = "for-hidapi" }
