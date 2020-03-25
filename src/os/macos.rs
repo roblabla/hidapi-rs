@@ -82,7 +82,7 @@ impl HidDevice {
         if report_id == 0x0 {
             /* Not using numbered Reports.
                Don't send the report number. */
-            data_to_send = &data[..1];
+            data_to_send = &data[1..];
         }
 
         /* Avoid crash if the device has been unplugged. */
@@ -376,13 +376,6 @@ int HID_API_EXPORT hid_exit(void)
     }
 
     return 0;
-}
-
-static void process_pending_events(void) {
-    SInt32 res;
-    do {
-        res = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.001, FALSE);
-    } while(res != kCFRunLoopRunFinished && res != kCFRunLoopRunTimedOut);
 }
 */
 fn create_device_info_with_usage(dev: IOHIDDeviceRef, usage_page: u32, usage: u32) -> Option<DeviceInfo> {
@@ -998,21 +991,6 @@ void HID_API_EXPORT hid_close(hid_device *dev)
     CFRelease(dev->device_handle);
 
     free_hid_device(dev);
-}
-
-int HID_API_EXPORT_CALL hid_get_manufacturer_string(hid_device *dev, wchar_t *string, size_t maxlen)
-{
-    return get_manufacturer_string(dev->device_handle, string, maxlen);
-}
-
-int HID_API_EXPORT_CALL hid_get_product_string(hid_device *dev, wchar_t *string, size_t maxlen)
-{
-    return get_product_string(dev->device_handle, string, maxlen);
-}
-
-int HID_API_EXPORT_CALL hid_get_serial_number_string(hid_device *dev, wchar_t *string, size_t maxlen)
-{
-    return get_serial_number(dev->device_handle, string, maxlen);
 }
 
 int HID_API_EXPORT_CALL hid_get_indexed_string(hid_device *dev, int string_index, wchar_t *string, size_t maxlen)
