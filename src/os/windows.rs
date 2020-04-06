@@ -160,12 +160,12 @@ impl HidDevice {
                    work like the other platforms, and to make it work more like the
                    HID spec, we'll skip over this byte. */
                 let bytes_read = bytes_read - 1;
-                copy_len = if data.len() > bytes_read { bytes_read } else { data.len() };
-                data.copy_from_slice(&self.read_buf[1..1 + copy_len]);
+                copy_len = std::cmp::min(data.len(), bytes_read);
+                data[..copy_len].copy_from_slice(&self.read_buf[1..1 + copy_len]);
             } else {
                 /* Copy the whole buffer, report number and all. */
-                copy_len = if data.len() > bytes_read { bytes_read } else { data.len() };
-                data.copy_from_slice(&self.read_buf[..copy_len]);
+                copy_len = std::cmp::min(data.len(), bytes_read);
+                data[..copy_len].copy_from_slice(&self.read_buf[..copy_len]);
             }
         }
 
@@ -628,11 +628,6 @@ pub fn hid_enumerate(vendor_id: u16, product_id: u16) -> impl Iterator<Item = cr
     let device_info_set = unsafe {
         SetupDiGetClassDevsA(&INTERFACE_CLASS_GUID, ptr::null_mut(), ptr::null_mut(), DIGCF_PRESENT | DIGCF_DEVICEINTERFACE)
     };
-
-    defer! {
-        /* Close the device information handle. */
-        unsafe { SetupDiDestroyDeviceInfoList(device_info_set) };
-    }
 
     HidDeviceIterator {
         device_info_set: device_info_set,
