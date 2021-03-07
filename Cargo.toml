@@ -9,6 +9,11 @@ edition = "2018"
 [dependencies]
 scopeguard = "1.1.0"
 widestring = "0.4.0"
+log = "0.4"
+bit_field = "0.10"
+
+[dev-dependencies]
+env_logger = "0.8"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["debug", "handleapi", "synchapi", "winbase", "errhandlingapi", "minwindef", "setupapi", "hidsdi", "ioapiset", "hidclass", "winerror"] }
@@ -18,6 +23,10 @@ io-kit-sys = "0.1"
 core-foundation-sys = "0.7.0"
 core-foundation = "0.7.0"
 mach = "0.3"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+ioctl-sys = "0.6"
+bitfield = "0.13"
 
 [patch.crates-io]
 core-foundation-sys = { git = "https://github.com/roblabla/core-foundation-rs", branch = "for-hidapi" }
