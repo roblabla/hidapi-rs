@@ -3,6 +3,7 @@ pub use error::*;
 
 mod os;
 
+use std::fmt;
 use std::ffi::{CString, CStr};
 use widestring::U16String;
 
@@ -162,7 +163,7 @@ impl HidDevice {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct DeviceInfo {
     path: CString,
     vendor_id: u16,
@@ -174,6 +175,23 @@ pub struct DeviceInfo {
     usage_page: u16,
     usage: u16,
     interface_number: i32,
+}
+
+impl fmt::Debug for DeviceInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("DeviceInfo")
+            .field("path", &self.path)
+            .field("vendor_id", &self.vendor_id)
+            .field("product_id", &self.product_id)
+            .field("serial_number", &self.serial_number.to_string_lossy())
+            .field("release_number", &self.release_number)
+            .field("manufacturer_string", &self.manufacturer_string.to_string_lossy())
+            .field("product_string", &self.product_string.to_string_lossy())
+            .field("usage_page", &self.usage_page)
+            .field("usage", &self.usage)
+            .field("interface_number", &self.interface_number)
+            .finish()
+    }
 }
 
 impl DeviceInfo {
